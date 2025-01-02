@@ -1,0 +1,18 @@
+configs:
+  api:
+    basePaths:
+      survey: "/surveys"
+      baseListCrudRoute: ""
+    routes:
+      createSurvey:
+        name: createSurvey
+        basePaths:
+          - ${configs.api.basePaths.survey}
+        method: POST
+        path: ${configs.api.basePaths.baseListCrudRoute}
+      listSurveys:
+        name: listSurveys
+        basePaths:
+          - ${configs.api.basePaths.survey}
+        method: GET
+        path: ${configs.api.basePaths.baseListCrudRoute}

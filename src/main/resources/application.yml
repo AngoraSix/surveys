@@ -1,0 +1,15 @@
+context:
+  initializer:
+    classes: com.angorasix.surveys.BeansInitializer
+server:
+  port: ${A6_SURVEYS_PORT:10951}
+
+spring:
+  config:
+    import: classpath:/api.yml, classpath:/security.yml
+  application:
+    name: ${APP_NAME:surveys}
+  data:
+    mongodb:
+      uri: ${A6_SURVEYS_MONGO_DB_URI:mongodb://localhost:27017/}${A6_SURVEYS_MONGO_DB_NAME:a6-surveys}${A6_SURVEYS_MONGO_DB_PARAMS:?}
+#      auto-index-creation: true
