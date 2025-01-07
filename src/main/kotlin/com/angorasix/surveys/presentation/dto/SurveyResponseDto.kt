@@ -7,8 +7,8 @@ import org.springframework.hateoas.RepresentationModel
  *
  * @author rozagerardo
  */
-data class SurveyDto(
+data class SurveyResponseDto(
     val surveyKey: String,
     val response: Map<String, Any> = emptyMap(),
     val id: String? = null,
-) : RepresentationModel<SurveyDto>()
+) : RepresentationModel<SurveyResponseDto>()

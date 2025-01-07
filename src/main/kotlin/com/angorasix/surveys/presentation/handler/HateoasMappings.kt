@@ -3,7 +3,7 @@ package com.angorasix.surveys.presentation.handler
 import com.angorasix.commons.domain.SimpleContributor
 import com.angorasix.surveys.infrastructure.config.configurationproperty.api.ApiConfigs
 import com.angorasix.surveys.infrastructure.queryfilters.ListSurveyFilter
-import com.angorasix.surveys.presentation.dto.SurveyDto
+import com.angorasix.surveys.presentation.dto.SurveyResponseDto
 import org.springframework.hateoas.CollectionModel
 import org.springframework.hateoas.Link
 import org.springframework.hateoas.mediatype.Affordances
@@ -19,23 +19,23 @@ import org.springframework.web.util.UriComponentsBuilder
  *
  * @author rozagerardo
  */
-fun List<SurveyDto>.generateCollectionModel(): Pair<Boolean, CollectionModel<SurveyDto>> {
+fun List<SurveyResponseDto>.generateCollectionModel(): Pair<Boolean, CollectionModel<SurveyResponseDto>> {
     val collectionModel = if (this.isEmpty()) {
         val wrappers = EmbeddedWrappers(false)
-        val wrapper: EmbeddedWrapper = wrappers.emptyCollectionOf(SurveyDto::class.java)
-        CollectionModel.of(listOf(wrapper)) as CollectionModel<SurveyDto>
+        val wrapper: EmbeddedWrapper = wrappers.emptyCollectionOf(SurveyResponseDto::class.java)
+        CollectionModel.of(listOf(wrapper)) as CollectionModel<SurveyResponseDto>
     } else {
-        CollectionModel.of(this).withFallbackType(SurveyDto::class.java)
+        CollectionModel.of(this).withFallbackType(SurveyResponseDto::class.java)
     }
     return Pair(this.isEmpty(), collectionModel)
 }
 
-fun CollectionModel<SurveyDto>.resolveHypermedia(
+fun CollectionModel<SurveyResponseDto>.resolveHypermedia(
     requestingContributor: SimpleContributor?,
     filter: ListSurveyFilter,
     apiConfigs: ApiConfigs,
     request: ServerRequest,
-): CollectionModel<SurveyDto> {
+): CollectionModel<SurveyResponseDto> {
     val listSurveys = apiConfigs.routes.listSurveys
     // self
     val selfLink = Link.of(
@@ -52,10 +52,10 @@ fun CollectionModel<SurveyDto>.resolveHypermedia(
     return this
 }
 
-fun SurveyDto.resolveHypermedia(
+fun SurveyResponseDto.resolveHypermedia(
     apiConfigs: ApiConfigs,
     request: ServerRequest,
-): SurveyDto {
+): SurveyResponseDto {
     val getSingleRoute = apiConfigs.routes.getSurvey
     // self
     val selfLink =

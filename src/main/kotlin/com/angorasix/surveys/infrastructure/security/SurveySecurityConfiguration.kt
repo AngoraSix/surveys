@@ -1,6 +1,7 @@
 package com.angorasix.surveys.infrastructure.security
 
 import org.springframework.context.annotation.Bean
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.web.server.SecurityWebFilterChain
@@ -26,8 +27,16 @@ class SurveySecurityConfiguration {
     @Bean
     fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
         http.authorizeExchange { exchanges: ServerHttpSecurity.AuthorizeExchangeSpec ->
-            exchanges.anyExchange().authenticated()
-        }.oauth2ResourceServer { oauth2 -> oauth2.jwt(Customizer.withDefaults()) }
+            exchanges
+                .pathMatchers(
+                    HttpMethod.POST,
+                    "/**",
+                    "/ls1-learnmore-v0.1.0/responses",
+                    "/surveys/ls1-learnmore-v0.1.0/responses").permitAll()
+                .anyExchange().permitAll()
+        }
+            .csrf { it.disable() }
+            //.oauth2ResourceServer { oauth2 -> oauth2.jwt(Customizer.withDefaults()) }
         return http.build()
     }
 }

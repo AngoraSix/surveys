@@ -13,16 +13,16 @@ import org.springframework.data.mongodb.core.mapping.Document
  * @author rozagerardo
  */
 @Document
-data class Survey @PersistenceCreator private constructor(
+data class SurveyResponse @PersistenceCreator private constructor(
     @field:Id val id: String?,
     val surveyKey: String,
-    val contributorId: String,
+    val contributorId: String?,
     val admins: Set<SimpleContributor> = emptySet(),
     val response: Map<String, Any> = emptyMap(),
 ) {
     constructor(
         surveyKey: String,
-        contributorId: String,
+        contributorId: String?,
         admins: Set<SimpleContributor> = emptySet(),
         response: Map<String, Any> = emptyMap(),
     ) : this(

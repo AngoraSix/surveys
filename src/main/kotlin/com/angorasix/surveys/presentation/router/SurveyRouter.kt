@@ -22,24 +22,26 @@ class SurveyRouter(
      * @return the [RouterFunction] with all the routes for Surveys
      */
     fun surveysRouterFunction() = coRouter {
-        filter { request, next ->
-            extractRequestingContributor(
-                request,
-                next,
-            )
-        }
         apiConfigs.basePaths.surveys.nest {
             apiConfigs.basePaths.baseListCrudRoute.nest {
-                method(apiConfigs.routes.createSurvey.method).nest {
-                    method(
-                        apiConfigs.routes.createSurvey.method,
-                        handler::createSurvey,
-                    )
-                }
+//                filter { request, next ->
+//                    extractRequestingContributor(
+//                        request,
+//                        next,
+//                    )
+//                }
                 method(apiConfigs.routes.listSurveys.method).nest {
                     method(
                         apiConfigs.routes.listSurveys.method,
                         handler::listSurveys,
+                    )
+                }
+            }
+            apiConfigs.basePaths.baseByKeyRoute.nest {
+                apiConfigs.routes.registerSurveyResponse.path.nest {
+                    method(
+                        apiConfigs.routes.registerSurveyResponse.method,
+                        handler::registerSurveyResponse,
                     )
                 }
             }

@@ -9,7 +9,7 @@ import org.springframework.data.repository.kotlin.CoroutineSortingRepository
  *
  * @author rozagerardo
  */
-interface SurveyRepository :
-    CoroutineCrudRepository<Survey, String>,
-    CoroutineSortingRepository<Survey, String>,
+interface SurveyResponseRepository :
+    CoroutineCrudRepository<SurveyResponse, String>,
+    CoroutineSortingRepository<SurveyResponse, String>,
     SurveyFilterRepository

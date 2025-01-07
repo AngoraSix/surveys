@@ -4,6 +4,10 @@ context:
 server:
   port: ${A6_SURVEYS_PORT:10951}
 
+logging:
+  level:
+    root: ${A6_SURVEYS_LOGGING_LEVEL:DEBUG}
+
 spring:
   config:
     import: classpath:/api.yml, classpath:/security.yml
