@@ -4,11 +4,11 @@ import com.angorasix.commons.domain.SimpleContributor
 import com.angorasix.commons.infrastructure.constants.AngoraSixInfrastructure
 import com.angorasix.commons.reactive.presentation.error.resolveBadRequest
 import com.angorasix.surveys.application.SurveyService
-import com.angorasix.surveys.domain.survey.Survey
+import com.angorasix.surveys.domain.survey.SurveyResponse
 import com.angorasix.surveys.infrastructure.config.configurationproperty.api.ApiConfigs
 import com.angorasix.surveys.infrastructure.queryfilters.ListSurveyFilter
-import com.angorasix.surveys.presentation.dto.SurveyDto
 import com.angorasix.surveys.presentation.dto.SurveyQueryParams
+import com.angorasix.surveys.presentation.dto.SurveyResponseDto
 import org.springframework.hateoas.CollectionModel
 import org.springframework.hateoas.IanaLinkRelations
 import org.springframework.hateoas.MediaTypes
@@ -71,60 +71,69 @@ class SurveyHandler(
      * @param request - HTTP `ServerRequest` object
      * @return the `ServerResponse`
      */
-    suspend fun createSurvey(request: ServerRequest): ServerResponse {
+    suspend fun registerSurveyResponse(request: ServerRequest): ServerResponse {
         val requestingContributor =
             request.attributes()[AngoraSixInfrastructure.REQUEST_ATTRIBUTE_CONTRIBUTOR_KEY]
+        val surveyKey = request.pathVariable("surveyKey")
 
-        return if (requestingContributor is SimpleContributor) {
-            val survey = try {
-                request.awaitBody<SurveyDto>().convertToDomain(requestingContributor)
-            } catch (e: IllegalArgumentException) {
-                return resolveBadRequest(
-                    e.message ?: "Incorrect Survey body",
-                    "Survey",
-                )
-            }
-
-            val outputSurvey = service.createSurvey(survey)
-                .convertToDto(apiConfigs, request)
-
-            val selfLink =
-                outputSurvey.links.getRequiredLink(IanaLinkRelations.SELF).href
-
-            created(URI.create(selfLink)).contentType(MediaTypes.HAL_FORMS_JSON)
-                .bodyValueAndAwait(outputSurvey)
-        } else {
-            resolveBadRequest("Invalid Contributor Token", "Contributor Token")
+        val survey = try {
+            request.awaitBody<Map<String, Any>>().toSurveyResponseDto(surveyKey)
+                .convertToDomain(requestingContributor as SimpleContributor?)
+        } catch (e: IllegalArgumentException) {
+            return resolveBadRequest(
+                e.message ?: "Incorrect Survey body",
+                "Survey",
+            )
         }
+
+        val outputSurvey = service.registerSurveyResponse(survey)
+            .convertToDto(apiConfigs, request)
+
+        val selfLink =
+            outputSurvey.links.getRequiredLink(IanaLinkRelations.SELF).href
+
+        return created(URI.create(selfLink)).contentType(MediaTypes.HAL_FORMS_JSON)
+            .bodyValueAndAwait(outputSurvey)
     }
 }
 
-private fun Survey.convertToDto(): SurveyDto =
-    SurveyDto(surveyKey = surveyKey, response = response, id = id)
+private fun SurveyResponse.convertToDto(): SurveyResponseDto =
+    SurveyResponseDto(surveyKey = surveyKey, response = response, id = id)
 
-private fun Survey.convertToDto(
+private fun SurveyResponse.convertToDto(
     apiConfigs: ApiConfigs,
     request: ServerRequest,
-): SurveyDto =
+): SurveyResponseDto =
     convertToDto().resolveHypermedia(apiConfigs, request)
 
-private fun SurveyDto.convertToDomain(
-    requestingContributor: SimpleContributor,
-): Survey {
-    return Survey(
+private fun Map<String, Any>.toSurveyResponseDto(
+    surveyKey: String,
+    id: String? = null,
+): SurveyResponseDto {
+    return SurveyResponseDto(
         surveyKey = surveyKey,
-        contributorId = requestingContributor.contributorId,
-        admins = setOf(requestingContributor),
+        response = this,
+        id = id,
+    )
+}
+
+private fun SurveyResponseDto.convertToDomain(
+    requestingContributor: SimpleContributor?,
+): SurveyResponse {
+    return SurveyResponse(
+        surveyKey = surveyKey,
+        contributorId = requestingContributor?.contributorId,
+        admins = requestingContributor?.let { setOf(it) } ?: emptySet(),
         response = response,
     )
 }
 
-fun List<SurveyDto>.convertToDto(
+fun List<SurveyResponseDto>.convertToDto(
     contributor: SimpleContributor?,
     filter: ListSurveyFilter,
     apiConfigs: ApiConfigs,
     request: ServerRequest,
-): CollectionModel<SurveyDto> {
+): CollectionModel<SurveyResponseDto> {
     // Fix this when Spring HATEOAS provides consistent support for reactive/coroutines
     val pair = generateCollectionModel()
     return pair.second.resolveHypermedia(
