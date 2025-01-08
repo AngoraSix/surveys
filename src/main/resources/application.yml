@@ -6,7 +6,7 @@ server:
 
 logging:
   level:
-    root: ${A6_SURVEYS_LOGGING_LEVEL:DEBUG}
+    root: ${A6_SURVEYS_LOGGING_LEVEL:INFO}
 
 spring:
   config:
