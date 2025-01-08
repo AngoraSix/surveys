@@ -30,7 +30,8 @@ class SurveySecurityConfiguration {
             exchanges
                 .pathMatchers(
                     HttpMethod.POST,
-                    "/surveys/*/responses").permitAll()
+                    "/surveys/*/responses",
+                ).permitAll()
                 .anyExchange().permitAll()
         }
             .csrf { it.disable() }
