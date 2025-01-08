@@ -23,13 +23,13 @@ class SurveyRouter(
      */
     fun surveysRouterFunction() = coRouter {
         apiConfigs.basePaths.surveys.nest {
+            filter { request, next ->
+                extractRequestingContributor(
+                    request,
+                    next,
+                )
+            }
             apiConfigs.basePaths.baseListCrudRoute.nest {
-//                filter { request, next ->
-//                    extractRequestingContributor(
-//                        request,
-//                        next,
-//                    )
-//                }
                 method(apiConfigs.routes.listSurveys.method).nest {
                     method(
                         apiConfigs.routes.listSurveys.method,

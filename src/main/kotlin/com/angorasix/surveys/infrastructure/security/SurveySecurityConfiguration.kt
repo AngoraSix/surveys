@@ -30,13 +30,11 @@ class SurveySecurityConfiguration {
             exchanges
                 .pathMatchers(
                     HttpMethod.POST,
-                    "/**",
-                    "/ls1-learnmore-v0.1.0/responses",
-                    "/surveys/ls1-learnmore-v0.1.0/responses").permitAll()
+                    "/surveys/*/responses").permitAll()
                 .anyExchange().permitAll()
         }
             .csrf { it.disable() }
-            //.oauth2ResourceServer { oauth2 -> oauth2.jwt(Customizer.withDefaults()) }
+            .oauth2ResourceServer { oauth2 -> oauth2.jwt(Customizer.withDefaults()) }
         return http.build()
     }
 }
