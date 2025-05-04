@@ -1,6 +1,6 @@
 package com.angorasix.surveys.infrastructure.persistence.repository
 
-import com.angorasix.commons.domain.SimpleContributor
+import com.angorasix.commons.domain.A6Contributor
 import com.angorasix.surveys.domain.survey.SurveyResponse
 import com.angorasix.surveys.infrastructure.queryfilters.ListSurveyFilter
 import kotlinx.coroutines.flow.Flow
@@ -14,6 +14,6 @@ import kotlinx.coroutines.flow.Flow
 interface SurveyFilterRepository {
     suspend fun findForContributorUsingFilter(
         filter: ListSurveyFilter,
-        requestingContributor: SimpleContributor,
+        requestingContributor: A6Contributor,
     ): Flow<SurveyResponse>
 }

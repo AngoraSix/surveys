@@ -1,6 +1,6 @@
 package com.angorasix.surveys.presentation.handler
 
-import com.angorasix.commons.domain.SimpleContributor
+import com.angorasix.commons.domain.A6Contributor
 import com.angorasix.surveys.infrastructure.config.configurationproperty.api.ApiConfigs
 import com.angorasix.surveys.infrastructure.queryfilters.ListSurveyFilter
 import com.angorasix.surveys.presentation.dto.SurveyResponseDto
@@ -20,31 +20,40 @@ import org.springframework.web.util.UriComponentsBuilder
  * @author rozagerardo
  */
 fun List<SurveyResponseDto>.generateCollectionModel(): Pair<Boolean, CollectionModel<SurveyResponseDto>> {
-    val collectionModel = if (this.isEmpty()) {
-        val wrappers = EmbeddedWrappers(false)
-        val wrapper: EmbeddedWrapper = wrappers.emptyCollectionOf(SurveyResponseDto::class.java)
-        CollectionModel.of(listOf(wrapper)) as CollectionModel<SurveyResponseDto>
-    } else {
-        CollectionModel.of(this).withFallbackType(SurveyResponseDto::class.java)
-    }
+    val collectionModel =
+        if (this.isEmpty()) {
+            val wrappers = EmbeddedWrappers(false)
+            val wrapper: EmbeddedWrapper = wrappers.emptyCollectionOf(SurveyResponseDto::class.java)
+            CollectionModel.of(listOf(wrapper)) as CollectionModel<SurveyResponseDto>
+        } else {
+            CollectionModel.of(this).withFallbackType(SurveyResponseDto::class.java)
+        }
     return Pair(this.isEmpty(), collectionModel)
 }
 
 fun CollectionModel<SurveyResponseDto>.resolveHypermedia(
-    requestingContributor: SimpleContributor?,
+    requestingContributor: A6Contributor?,
     filter: ListSurveyFilter,
     apiConfigs: ApiConfigs,
     request: ServerRequest,
 ): CollectionModel<SurveyResponseDto> {
     val listSurveys = apiConfigs.routes.listSurveys
     // self
-    val selfLink = Link.of(
-        uriBuilder(request).path(listSurveys.resolvePath())
-            .queryParams(filter.toMultiValueMap()).build()
-            .toUriString(),
-    ).withSelfRel()
+    val selfLink =
+        Link
+            .of(
+                uriBuilder(request)
+                    .path(listSurveys.resolvePath())
+                    .queryParams(filter.toMultiValueMap())
+                    .build()
+                    .toUriString(),
+            ).withSelfRel()
     val selfLinkWithDefaultAffordance =
-        Affordances.of(selfLink).afford(HttpMethod.OPTIONS).withName("default").toLink()
+        Affordances
+            .of(selfLink)
+            .afford(HttpMethod.OPTIONS)
+            .withName("default")
+            .toLink()
     add(selfLinkWithDefaultAffordance)
     if (requestingContributor != null && requestingContributor.isAdminHint == true) {
         // here goes admin-specific collection hypermedia
@@ -59,16 +68,26 @@ fun SurveyResponseDto.resolveHypermedia(
     val getSingleRoute = apiConfigs.routes.getSurvey
     // self
     val selfLink =
-        Link.of(uriBuilder(request).path(getSingleRoute.resolvePath()).build().toUriString())
-            .withRel(getSingleRoute.name).expand(id).withSelfRel()
+        Link
+            .of(uriBuilder(request).path(getSingleRoute.resolvePath()).build().toUriString())
+            .withRel(getSingleRoute.name)
+            .expand(id)
+            .withSelfRel()
     val selfLinkWithDefaultAffordance =
-        Affordances.of(selfLink).afford(HttpMethod.OPTIONS).withName("default").toLink()
+        Affordances
+            .of(selfLink)
+            .afford(HttpMethod.OPTIONS)
+            .withName("default")
+            .toLink()
     add(selfLinkWithDefaultAffordance)
 
     return this
 }
 
-private fun uriBuilder(request: ServerRequest) = request.requestPath().contextPath().let {
-    UriComponentsBuilder.fromHttpRequest(request.exchange().request).replacePath(it.toString()) //
-        .replaceQuery("")
-}
+private fun uriBuilder(request: ServerRequest) =
+    request.requestPath().contextPath().let {
+        UriComponentsBuilder
+            .fromHttpRequest(request.exchange().request)
+            .replacePath(it.toString()) //
+            .replaceQuery("")
+    }
