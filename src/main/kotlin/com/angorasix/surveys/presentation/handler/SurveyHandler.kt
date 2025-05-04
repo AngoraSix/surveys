@@ -1,6 +1,6 @@
 package com.angorasix.surveys.presentation.handler
 
-import com.angorasix.commons.domain.SimpleContributor
+import com.angorasix.commons.domain.A6Contributor
 import com.angorasix.commons.infrastructure.constants.AngoraSixInfrastructure
 import com.angorasix.commons.reactive.presentation.error.resolveBadRequest
 import com.angorasix.surveys.application.SurveyService
@@ -40,17 +40,18 @@ class SurveyHandler(
     suspend fun listSurveys(request: ServerRequest): ServerResponse {
         val requestingContributor =
             request.attributes()[AngoraSixInfrastructure.REQUEST_ATTRIBUTE_CONTRIBUTOR_KEY]
-        return if (requestingContributor is SimpleContributor) {
+        return if (requestingContributor is A6Contributor) {
             val filter = request.queryParams().toQueryFilter()
-            service.findSurveys(filter, requestingContributor)
+            service
+                .findSurveys(filter, requestingContributor)
                 .map {
                     it.convertToDto(
                         apiConfigs,
                         request,
                     )
-                }
-                .let {
-                    ok().contentType(MediaTypes.HAL_FORMS_JSON)
+                }.let {
+                    ok()
+                        .contentType(MediaTypes.HAL_FORMS_JSON)
                         .bodyValueAndAwait(
                             it.convertToDto(
                                 requestingContributor,
@@ -76,60 +77,60 @@ class SurveyHandler(
             request.attributes()[AngoraSixInfrastructure.REQUEST_ATTRIBUTE_CONTRIBUTOR_KEY]
         val surveyKey = request.pathVariable("surveyKey")
 
-        val survey = try {
-            request.awaitBody<Map<String, Any>>().toSurveyResponseDto(surveyKey)
-                .convertToDomain(requestingContributor as SimpleContributor?)
-        } catch (e: IllegalArgumentException) {
-            return resolveBadRequest(
-                e.message ?: "Incorrect Survey body",
-                "Survey",
-            )
-        }
+        val survey =
+            try {
+                request
+                    .awaitBody<Map<String, Any>>()
+                    .toSurveyResponseDto(surveyKey)
+                    .convertToDomain(requestingContributor as A6Contributor?)
+            } catch (e: IllegalArgumentException) {
+                return resolveBadRequest(
+                    e.message ?: "Incorrect Survey body",
+                    "Survey",
+                )
+            }
 
-        val outputSurvey = service.registerSurveyResponse(survey)
-            .convertToDto(apiConfigs, request)
+        val outputSurvey =
+            service
+                .registerSurveyResponse(survey)
+                .convertToDto(apiConfigs, request)
 
         val selfLink =
             outputSurvey.links.getRequiredLink(IanaLinkRelations.SELF).href
 
-        return created(URI.create(selfLink)).contentType(MediaTypes.HAL_FORMS_JSON)
+        return created(URI.create(selfLink))
+            .contentType(MediaTypes.HAL_FORMS_JSON)
             .bodyValueAndAwait(outputSurvey)
     }
 }
 
-private fun SurveyResponse.convertToDto(): SurveyResponseDto =
-    SurveyResponseDto(surveyKey = surveyKey, response = response, id = id)
+private fun SurveyResponse.convertToDto(): SurveyResponseDto = SurveyResponseDto(surveyKey = surveyKey, response = response, id = id)
 
 private fun SurveyResponse.convertToDto(
     apiConfigs: ApiConfigs,
     request: ServerRequest,
-): SurveyResponseDto =
-    convertToDto().resolveHypermedia(apiConfigs, request)
+): SurveyResponseDto = convertToDto().resolveHypermedia(apiConfigs, request)
 
 private fun Map<String, Any>.toSurveyResponseDto(
     surveyKey: String,
     id: String? = null,
-): SurveyResponseDto {
-    return SurveyResponseDto(
+): SurveyResponseDto =
+    SurveyResponseDto(
         surveyKey = surveyKey,
         response = this,
         id = id,
     )
-}
 
-private fun SurveyResponseDto.convertToDomain(
-    requestingContributor: SimpleContributor?,
-): SurveyResponse {
-    return SurveyResponse(
+private fun SurveyResponseDto.convertToDomain(requestingContributor: A6Contributor?): SurveyResponse =
+    SurveyResponse(
         surveyKey = surveyKey,
         contributorId = requestingContributor?.contributorId,
         admins = requestingContributor?.let { setOf(it) } ?: emptySet(),
         response = response,
     )
-}
 
 fun List<SurveyResponseDto>.convertToDto(
-    contributor: SimpleContributor?,
+    contributor: A6Contributor?,
     filter: ListSurveyFilter,
     apiConfigs: ApiConfigs,
     request: ServerRequest,
@@ -144,8 +145,7 @@ fun List<SurveyResponseDto>.convertToDto(
     )
 }
 
-private fun MultiValueMap<String, String>.toQueryFilter(): ListSurveyFilter {
-    return ListSurveyFilter(
+private fun MultiValueMap<String, String>.toQueryFilter(): ListSurveyFilter =
+    ListSurveyFilter(
         surveyKey = get(SurveyQueryParams.SURVEY_KEY.param)?.flatMap { it.split(",") },
     )
-}
