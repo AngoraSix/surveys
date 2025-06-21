@@ -19,10 +19,21 @@ class SurveyService(
         requestingContributor: A6Contributor,
     ): List<SurveyResponse> =
         repository
-            .findForContributorUsingFilter(
+            .findUsingFilter(
                 filter = filter,
                 requestingContributor = requestingContributor,
             ).toList()
 
     suspend fun registerSurveyResponse(surveyResponse: SurveyResponse): SurveyResponse = repository.save(surveyResponse)
+
+    suspend fun getSurveyResponse(
+        surveyKey: String,
+        requestingContributor: A6Contributor,
+    ): SurveyResponse? =
+        repository.findSingleUsingFilter(
+            ListSurveyFilter(
+                surveyKey = listOf(surveyKey),
+            ),
+            requestingContributor,
+        )
 }

@@ -12,8 +12,13 @@ import kotlinx.coroutines.flow.Flow
  * @author rozagerardo
  */
 interface SurveyFilterRepository {
-    suspend fun findForContributorUsingFilter(
+    suspend fun findUsingFilter(
         filter: ListSurveyFilter,
-        requestingContributor: A6Contributor,
+        requestingContributor: A6Contributor?,
     ): Flow<SurveyResponse>
+
+    suspend fun findSingleUsingFilter(
+        filter: ListSurveyFilter,
+        requestingContributor: A6Contributor?,
+    ): SurveyResponse?
 }

@@ -3,7 +3,7 @@ configs:
     basePaths:
       surveys: "/surveys"
       baseListCrudRoute: ""
-      baseByKeyRoute: "/{surveyKey}"
+      baseResponsesByKeyRoute: "/{surveyKey}/responses"
     routes:
 #      IN THE FUTURE, WE SHOULD ACTUALLY CREATE A SURVEY BEFORE REGISTERING A RESPONSE
 #      createSurvey:
@@ -16,9 +16,16 @@ configs:
         name: registerSurveyResponse
         basePaths:
           - ${configs.api.basePaths.survey}
-          - ${configs.api.basePaths.baseByKeyRoute}
+          - ${configs.api.basePaths.baseResponsesByKeyRoute}
         method: POST
-        path: "/responses"
+        path: ""
+      getSurveyResponse:
+        name: getSurveyResponse
+        basePaths:
+          - ${configs.api.basePaths.survey}
+          - ${configs.api.basePaths.baseResponsesByKeyRoute}
+        method: GET
+        path: ""
       listSurveys:
         name: listSurveys
         basePaths:

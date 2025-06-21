@@ -3,6 +3,7 @@ package com.angorasix.surveys.presentation.handler
 import com.angorasix.commons.domain.A6Contributor
 import com.angorasix.commons.infrastructure.constants.AngoraSixInfrastructure
 import com.angorasix.commons.reactive.presentation.error.resolveBadRequest
+import com.angorasix.commons.reactive.presentation.error.resolveNotFound
 import com.angorasix.surveys.application.SurveyService
 import com.angorasix.surveys.domain.survey.SurveyResponse
 import com.angorasix.surveys.infrastructure.config.configurationproperty.api.ApiConfigs
@@ -41,26 +42,28 @@ class SurveyHandler(
         val requestingContributor =
             request.attributes()[AngoraSixInfrastructure.REQUEST_ATTRIBUTE_CONTRIBUTOR_KEY]
         return if (requestingContributor is A6Contributor) {
-            val filter = request.queryParams().toQueryFilter()
-            service
-                .findSurveys(filter, requestingContributor)
-                .map {
-                    it.convertToDto(
-                        apiConfigs,
-                        request,
-                    )
-                }.let {
-                    ok()
-                        .contentType(MediaTypes.HAL_FORMS_JSON)
-                        .bodyValueAndAwait(
-                            it.convertToDto(
-                                requestingContributor,
-                                filter,
-                                apiConfigs,
-                                request,
-                            ),
-                        )
-                }
+            resolveNotFound("List Surveys not accesible", "Surveys")
+
+//            val filter = request.queryParams().toQueryFilter()
+//            service
+//                .findSurveys(filter, requestingContributor)
+//                .map {
+//                    it.convertToDto(
+//                        apiConfigs,
+//                        request,
+//                    )
+//                }.let {
+//                    ok()
+//                        .contentType(MediaTypes.HAL_FORMS_JSON)
+//                        .bodyValueAndAwait(
+//                            it.convertToDto(
+//                                requestingContributor,
+//                                filter,
+//                                apiConfigs,
+//                                request,
+//                            ),
+//                        )
+//                }
         } else {
             resolveBadRequest("Invalid Contributor Token", "Contributor Token")
         }
@@ -101,6 +104,33 @@ class SurveyHandler(
         return created(URI.create(selfLink))
             .contentType(MediaTypes.HAL_FORMS_JSON)
             .bodyValueAndAwait(outputSurvey)
+    }
+
+    /**
+     * Handler for the Create Survey endpoint, to create a new Survey entity.
+     *
+     * @param request - HTTP `ServerRequest` object
+     * @return the `ServerResponse`
+     */
+    suspend fun getSurveyResponse(request: ServerRequest): ServerResponse {
+        val requestingContributor =
+            request.attributes()[AngoraSixInfrastructure.REQUEST_ATTRIBUTE_CONTRIBUTOR_KEY]
+        val surveyKey = request.pathVariable("surveyKey")
+
+        return if (requestingContributor is A6Contributor) {
+            service
+                .getSurveyResponse(surveyKey, requestingContributor)
+                ?.let {
+                    val outputSurvey =
+                        it.convertToDto(
+                            apiConfigs,
+                            request,
+                        )
+                    ok().contentType(MediaTypes.HAL_FORMS_JSON).bodyValueAndAwait(outputSurvey)
+                } ?: resolveNotFound("Can't find Survey", "Survey")
+        } else {
+            resolveBadRequest("Invalid Contributor Token", "Contributor Token")
+        }
     }
 }
 
