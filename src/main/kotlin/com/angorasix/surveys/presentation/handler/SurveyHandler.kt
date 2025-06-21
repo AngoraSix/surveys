@@ -7,13 +7,9 @@ import com.angorasix.commons.reactive.presentation.error.resolveNotFound
 import com.angorasix.surveys.application.SurveyService
 import com.angorasix.surveys.domain.survey.SurveyResponse
 import com.angorasix.surveys.infrastructure.config.configurationproperty.api.ApiConfigs
-import com.angorasix.surveys.infrastructure.queryfilters.ListSurveyFilter
-import com.angorasix.surveys.presentation.dto.SurveyQueryParams
 import com.angorasix.surveys.presentation.dto.SurveyResponseDto
-import org.springframework.hateoas.CollectionModel
 import org.springframework.hateoas.IanaLinkRelations
 import org.springframework.hateoas.MediaTypes
-import org.springframework.util.MultiValueMap
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.created
@@ -159,23 +155,23 @@ private fun SurveyResponseDto.convertToDomain(requestingContributor: A6Contribut
         response = response,
     )
 
-fun List<SurveyResponseDto>.convertToDto(
-    contributor: A6Contributor?,
-    filter: ListSurveyFilter,
-    apiConfigs: ApiConfigs,
-    request: ServerRequest,
-): CollectionModel<SurveyResponseDto> {
-    // Fix this when Spring HATEOAS provides consistent support for reactive/coroutines
-    val pair = generateCollectionModel()
-    return pair.second.resolveHypermedia(
-        contributor,
-        filter,
-        apiConfigs,
-        request,
-    )
-}
+// fun List<SurveyResponseDto>.convertToDto(
+//    contributor: A6Contributor?,
+//    filter: ListSurveyFilter,
+//    apiConfigs: ApiConfigs,
+//    request: ServerRequest,
+// ): CollectionModel<SurveyResponseDto> {
+//    // Fix this when Spring HATEOAS provides consistent support for reactive/coroutines
+//    val pair = generateCollectionModel()
+//    return pair.second.resolveHypermedia(
+//        contributor,
+//        filter,
+//        apiConfigs,
+//        request,
+//    )
+// }
 
-private fun MultiValueMap<String, String>.toQueryFilter(): ListSurveyFilter =
-    ListSurveyFilter(
-        surveyKey = get(SurveyQueryParams.SURVEY_KEY.param)?.flatMap { it.split(",") },
-    )
+// private fun MultiValueMap<String, String>.toQueryFilter(): ListSurveyFilter =
+//    ListSurveyFilter(
+//        surveyKey = get(SurveyQueryParams.SURVEY_KEY.param)?.flatMap { it.split(",") },
+//    )
