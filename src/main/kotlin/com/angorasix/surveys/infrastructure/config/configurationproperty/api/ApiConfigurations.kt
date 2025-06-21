@@ -22,11 +22,12 @@ data class ApiConfigs(
 data class BasePathConfigs(
     val surveys: String,
     val baseListCrudRoute: String,
-    val baseByKeyRoute: String,
+    val baseResponsesByKeyRoute: String,
 )
 
 data class RoutesConfigs(
     val listSurveys: Route,
     val registerSurveyResponse: Route,
+    val getSurveyResponse: Route,
     val getSurvey: Route,
 )

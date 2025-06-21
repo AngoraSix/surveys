@@ -29,19 +29,25 @@ class SurveyRouter(
                         next,
                     )
                 }
+                apiConfigs.basePaths.baseResponsesByKeyRoute.nest {
+                    method(apiConfigs.routes.registerSurveyResponse.method).nest {
+                        method(
+                            apiConfigs.routes.registerSurveyResponse.method,
+                            handler::registerSurveyResponse,
+                        )
+                    }
+                    method(apiConfigs.routes.getSurveyResponse.method).nest {
+                        method(
+                            apiConfigs.routes.getSurveyResponse.method,
+                            handler::getSurveyResponse,
+                        )
+                    }
+                }
                 apiConfigs.basePaths.baseListCrudRoute.nest {
                     method(apiConfigs.routes.listSurveys.method).nest {
                         method(
                             apiConfigs.routes.listSurveys.method,
                             handler::listSurveys,
-                        )
-                    }
-                }
-                apiConfigs.basePaths.baseByKeyRoute.nest {
-                    apiConfigs.routes.registerSurveyResponse.path.nest {
-                        method(
-                            apiConfigs.routes.registerSurveyResponse.method,
-                            handler::registerSurveyResponse,
                         )
                     }
                 }
