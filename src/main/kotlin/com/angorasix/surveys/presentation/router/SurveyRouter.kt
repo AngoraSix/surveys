@@ -1,7 +1,7 @@
 package com.angorasix.surveys.presentation.router
 
 import com.angorasix.commons.reactive.presentation.filter.extractRequestingContributor
-import com.angorasix.surveys.infrastructure.config.configurationproperty.api.ApiConfigs
+import com.angorasix.surveys.infrastructure.config.api.ApiConfigs
 import com.angorasix.surveys.presentation.handler.SurveyHandler
 import org.springframework.web.reactive.function.server.RouterFunction
 import org.springframework.web.reactive.function.server.coRouter

@@ -1,4 +1,4 @@
-package com.angorasix.surveys.infrastructure.config.configurationproperty.api
+package com.angorasix.surveys.infrastructure.config.api
 
 import com.angorasix.commons.infrastructure.config.configurationproperty.api.Route
 import org.springframework.boot.context.properties.ConfigurationProperties
