@@ -1,7 +1,7 @@
 package com.angorasix.surveys.presentation.handler
 
 import com.angorasix.commons.domain.A6Contributor
-import com.angorasix.surveys.infrastructure.config.configurationproperty.api.ApiConfigs
+import com.angorasix.surveys.infrastructure.config.api.ApiConfigs
 import com.angorasix.surveys.infrastructure.queryfilters.ListSurveyFilter
 import com.angorasix.surveys.presentation.dto.SurveyResponseDto
 import org.springframework.hateoas.CollectionModel

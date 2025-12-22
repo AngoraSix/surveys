@@ -6,7 +6,7 @@ import com.angorasix.commons.reactive.presentation.error.resolveBadRequest
 import com.angorasix.commons.reactive.presentation.error.resolveNotFound
 import com.angorasix.surveys.application.SurveyService
 import com.angorasix.surveys.domain.survey.SurveyResponse
-import com.angorasix.surveys.infrastructure.config.configurationproperty.api.ApiConfigs
+import com.angorasix.surveys.infrastructure.config.api.ApiConfigs
 import com.angorasix.surveys.presentation.dto.SurveyResponseDto
 import org.springframework.hateoas.IanaLinkRelations
 import org.springframework.hateoas.MediaTypes
@@ -91,7 +91,7 @@ class SurveyHandler(
 
         val outputSurvey =
             service
-                .registerSurveyResponse(survey)
+                .registerSurveyResponse(survey, requestingContributor)
                 .convertToDto(apiConfigs, request)
 
         val selfLink =

@@ -1,0 +1,30 @@
+# https://docs.spring.io/spring-cloud-stream/reference/rabbit/rabbit_overview/putting-it-all-together.html#page-title
+configs:
+  amqp:
+    bindings:
+      surveyRegistered: ${A6_SURVEYS_RABBITMQ_BINDINGS_SURVEYREGISTERED:surveyRegistered}
+
+spring:
+  cloud:
+    stream:
+      output-bindings: # we need explicit bindings bc we use StreamBridge
+        - ${configs.amqp.bindings.surveyRegistered}
+      bindings:
+        surveyRegistered:
+          destination: ${A6_SURVEYS_RABBITMQ_OUTPUT_SURVEYREGISTERED_EXCHANGE:surveyRegistered}
+      rabbit:
+        bindings:
+          surveyRegistered:
+            producer:
+              republishToDlq: false
+      binders:
+        a6Rabbit:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: ${A6_SURVEYS_RABBITMQ_HOST:localhost}
+                port: ${A6_SURVEYS_RABBITMQ_PORT:5672}
+                username: ${A6_SURVEYS_RABBITMQ_USER:guest}
+                password: ${A6_SURVEYS_RABBITMQ_PASSWORD:guest}
+                virtual-host: ${A6_SURVEYS_RABBITMQ_VHOST:/}

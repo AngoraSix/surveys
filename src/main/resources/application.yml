@@ -10,7 +10,7 @@ logging:
 
 spring:
   config:
-    import: classpath:/api.yml, classpath:/security.yml
+    import: classpath:/api.yml, classpath:/security.yml, classpath:/amqp.yml
   application:
     name: ${APP_NAME:surveys}
   data:
